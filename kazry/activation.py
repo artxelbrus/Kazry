@@ -59,7 +59,7 @@ class KazryTritonInPlace(torch.autograd.Function):
         BLOCK_SIZE=512
         N = x.numel()
         grid = lambda meta: (triton.cdiv(N, BLOCK_SIZE),)
-        kazry_forward[grid](x_ptr=x, BLOCK_SIZE=BLOCK_SIZE, N=N)
+        kazry_forward_In_place[grid](x_ptr=x, BLOCK_SIZE=BLOCK_SIZE, N=N)
         return x
     @staticmethod
     def backward(ctx, grad):

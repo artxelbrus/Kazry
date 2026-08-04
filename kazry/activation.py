@@ -65,7 +65,7 @@ class KazryTritonInPlace(torch.autograd.Function):
     def backward(ctx, grad):
         raise RuntimeError("Err, Kazry inplace does not support backward, use kazry with backward")
         return None
-class KazryWithBacward(nn.Module):
+class KazryWithBackward(nn.Module):
     def __init__(self):
         super().__init__()
     def forward(self, x):

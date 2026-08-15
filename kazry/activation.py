@@ -50,27 +50,27 @@ def kazry_backward(
 class KazryTritonWithBackward(torch.autograd.Function):
     @staticmethod
     def forward(ctx, x):
-        BLOCK_SIZE=512
         N = x.numel()
         y = torch.empty_like(x)
-        grid = lambda meta: (triton.cdiv(N meta['BLOCK_SIZE']),)
+        grid = lambda meta: (triton.cdiv(N, meta['BLOCK_SIZE']),)
+        @triton.autotune
         kazry_forward[grid](x_ptr=x, y_ptr=y, BLOCK_SIZE=BLOCK_SIZE, N=N)
         ctx.save_for_backward(x)
         return y
     @staticmethod
     def backward(ctx, grad):
-        BLOCK_SIZE=1024
         x = ctx.saved_tensors[0]
         N = grad.numel()
         grad_out = torch.empty_like(grad)
         grid = lambda meta: (triton.cdiv(N, meta['BLOCK_SIZE']),)
+        @triton.autotune
         kazry_backward[grid](x_ptr=x, grad_ptr=grad, grad_out_ptr=grad_out, BLOCK_SIZE=BLOCK_SIZE, N=N)
         return grad_out
 class KazryTritonInPlace(torch.autograd.Function):
     @staticmethod
     def forward(ctx, x):
-        BLOCK_SIZE=512
         N = x.numel()
+        @triton.autotune
         grid = lambda meta: (triton.cdiv(N, meta['BLOCK_SIZE']),)
         kazry_forward_in_place[grid](x_ptr=x, BLOCK_SIZE=BLOCK_SIZE, N=N)
         return x

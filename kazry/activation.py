@@ -15,6 +15,7 @@ import triton.language as tl
     ],
     key=['n_elements'],
 )
+@triton.autotune
 @triton.jit
 def kazry_forward(
     x_ptr, y_ptr, BLOCK_SIZE: tl.constexpr, N):
@@ -26,6 +27,7 @@ def kazry_forward(
     scale = tl.where(x >= 0.0, 1.0, exp)
     x = x * scale
     tl.store(y_ptr+offs, x.to(tl.bfloat16), mask=mask)
+@triton.autotune
 @triton.jit
 def kazry_forward_in_place(
     x_ptr, BLOCK_SIZE: tl.constexpr, N):
@@ -37,6 +39,7 @@ def kazry_forward_in_place(
     scale = tl.where(x >= 0.0, 1.0, exp)
     x = x * scale
     tl.store(x_ptr+offs, x.to(tl.bfloat16), mask=mask)
+@triton.autotune
 @triton.jit
 def kazry_backward(
     x_ptr, grad_ptr, grad_out_ptr, BLOCK_SIZE: tl.constexpr, N):

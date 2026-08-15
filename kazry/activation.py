@@ -15,7 +15,6 @@ import triton.language as tl
     ],
     key=['n_elements'],
 )
-@triton.autotune
 @triton.jit
 def kazry_forward(
     x_ptr, y_ptr, BLOCK_SIZE: tl.constexpr, N):
@@ -27,7 +26,6 @@ def kazry_forward(
     scale = tl.where(x >= 0.0, 1.0, exp)
     x = x * scale
     tl.store(y_ptr+offs, x.to(tl.bfloat16), mask=mask)
-@triton.autotune
 @triton.jit
 def kazry_forward_in_place(
     x_ptr, BLOCK_SIZE: tl.constexpr, N):
@@ -39,7 +37,6 @@ def kazry_forward_in_place(
     scale = tl.where(x >= 0.0, 1.0, exp)
     x = x * scale
     tl.store(x_ptr+offs, x.to(tl.bfloat16), mask=mask)
-@triton.autotune
 @triton.jit
 def kazry_backward(
     x_ptr, grad_ptr, grad_out_ptr, BLOCK_SIZE: tl.constexpr, N):
@@ -56,7 +53,6 @@ class KazryTritonWithBackward(torch.autograd.Function):
         N = x.numel()
         y = torch.empty_like(x)
         grid = lambda meta: (triton.cdiv(N, meta['BLOCK_SIZE']),)
-        @triton.autotune
         kazry_forward[grid](x_ptr=x, y_ptr=y, BLOCK_SIZE=BLOCK_SIZE, N=N)
         ctx.save_for_backward(x)
         return y
@@ -66,14 +62,12 @@ class KazryTritonWithBackward(torch.autograd.Function):
         N = grad.numel()
         grad_out = torch.empty_like(grad)
         grid = lambda meta: (triton.cdiv(N, meta['BLOCK_SIZE']),)
-        @triton.autotune
         kazry_backward[grid](x_ptr=x, grad_ptr=grad, grad_out_ptr=grad_out, BLOCK_SIZE=BLOCK_SIZE, N=N)
         return grad_out
 class KazryTritonInPlace(torch.autograd.Function):
     @staticmethod
     def forward(ctx, x):
         N = x.numel()
-        @triton.autotune
         grid = lambda meta: (triton.cdiv(N, meta['BLOCK_SIZE']),)
         kazry_forward_in_place[grid](x_ptr=x, BLOCK_SIZE=BLOCK_SIZE, N=N)
         return x

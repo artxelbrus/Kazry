@@ -4,14 +4,12 @@ import triton
 import triton.language as tl
 @triton.autotune(
     configs=[
-        triton.Config({'BLOCK_SIZE': 128}, num_warps=4, num_stages=3),
-        triton.Config({'BLOCK_SIZE': 128}, num_warps=8, num_stages=3),
-        triton.Config({'BLOCK_SIZE': 256}, num_warps=4, num_stages=3),
-        triton.Config({'BLOCK_SIZE': 256}, num_warps=8, num_stages=4),
+        triton.Config({'BLOCK_SIZE': 128}, num_warps=2, num_stages=2),
+        triton.Config({'BLOCK_SIZE': 256}, num_warps=4, num_stages=2),
+        triton.Config({'BLOCK_SIZE': 512}, num_warps=4, num_stages=2),
         triton.Config({'BLOCK_SIZE': 512}, num_warps=4, num_stages=3),
-        triton.Config({'BLOCK_SIZE': 512}, num_warps=8, num_stages=4),
-        triton.Config({'BLOCK_SIZE': 1024}, num_warps=8, num_stages=4),
-        triton.Config({'BLOCK_SIZE': 2048}, num_warps=8, num_stages=4),
+        triton.Config({'BLOCK_SIZE': 1024}, num_warps=4, num_stages=2),
+        triton.Config({'BLOCK_SIZE': 1024}, num_warps=8, num_stages=3),
     ],
     key=['N'],
 )
@@ -28,14 +26,12 @@ def kazry_forward(
     tl.store(y_ptr+offs, x.to(tl.bfloat16), mask=mask)
 @triton.autotune(
     configs=[
-        triton.Config({'BLOCK_SIZE': 128}, num_warps=4, num_stages=3),
-        triton.Config({'BLOCK_SIZE': 128}, num_warps=8, num_stages=3),
-        triton.Config({'BLOCK_SIZE': 256}, num_warps=4, num_stages=3),
-        triton.Config({'BLOCK_SIZE': 256}, num_warps=8, num_stages=4),
+        triton.Config({'BLOCK_SIZE': 128}, num_warps=2, num_stages=2),
+        triton.Config({'BLOCK_SIZE': 256}, num_warps=4, num_stages=2),
+        triton.Config({'BLOCK_SIZE': 512}, num_warps=4, num_stages=2),
         triton.Config({'BLOCK_SIZE': 512}, num_warps=4, num_stages=3),
-        triton.Config({'BLOCK_SIZE': 512}, num_warps=8, num_stages=4),
-        triton.Config({'BLOCK_SIZE': 1024}, num_warps=8, num_stages=4),
-        triton.Config({'BLOCK_SIZE': 2048}, num_warps=8, num_stages=4),
+        triton.Config({'BLOCK_SIZE': 1024}, num_warps=4, num_stages=2),
+        triton.Config({'BLOCK_SIZE': 1024}, num_warps=8, num_stages=3),
     ],
     key=['N'],
 )
@@ -52,14 +48,12 @@ def kazry_forward_in_place(
     tl.store(x_ptr+offs, x.to(tl.bfloat16), mask=mask)
 @triton.autotune(
     configs=[
-        triton.Config({'BLOCK_SIZE': 128}, num_warps=4, num_stages=3),
-        triton.Config({'BLOCK_SIZE': 128}, num_warps=8, num_stages=3),
-        triton.Config({'BLOCK_SIZE': 256}, num_warps=4, num_stages=3),
-        triton.Config({'BLOCK_SIZE': 256}, num_warps=8, num_stages=4),
+        triton.Config({'BLOCK_SIZE': 128}, num_warps=2, num_stages=2),
+        triton.Config({'BLOCK_SIZE': 256}, num_warps=4, num_stages=2),
+        triton.Config({'BLOCK_SIZE': 512}, num_warps=4, num_stages=2),
         triton.Config({'BLOCK_SIZE': 512}, num_warps=4, num_stages=3),
-        triton.Config({'BLOCK_SIZE': 512}, num_warps=8, num_stages=4),
-        triton.Config({'BLOCK_SIZE': 1024}, num_warps=8, num_stages=4),
-        triton.Config({'BLOCK_SIZE': 2048}, num_warps=8, num_stages=4),
+        triton.Config({'BLOCK_SIZE': 1024}, num_warps=4, num_stages=2),
+        triton.Config({'BLOCK_SIZE': 1024}, num_warps=8, num_stages=3),
     ],
     key=['N'],
 )

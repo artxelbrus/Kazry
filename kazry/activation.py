@@ -128,6 +128,13 @@ class KazryInPlace(nn.Module):
         super().__init__()
     def forward(self, x):
         return KazryTritonInPlace.apply(x)
+class KazryPyTorch(nn.Module):
+    def __init__(self):
+        super().__init__()
+    def forward(self, x):
+        return torch.where(x>=0.0, x, torch.exp(x)*x)
+def kazry_pytorch(x):
+    return torch.where(x>=0.0, x, torch.exp(x)*x)
 def kazry_with_backward(x):
     return KazryTritonWithBackward.apply(x)
 def kazry_inplace(x):

@@ -47,7 +47,7 @@ configs_triton = [
     triton.Config({'BLOCK_SIZE': 1024}, num_warps=8, num_stages=4),
 ]
 @triton.autotune(
-    configs=configs_triton
+    configs=configs_triton,
     key=['N'],
 )
 @triton.jit
@@ -62,7 +62,7 @@ def kazry_forward(
     x = x * scale
     tl.store(y_ptr+offs, x.to(tl.bfloat16), mask=mask)
 @triton.autotune(
-    configs=configs_triton
+    configs=configs_triton,
     key=['N'],
 )
 @triton.jit
@@ -77,7 +77,7 @@ def kazry_forward_in_place(
     x = x * scale
     tl.store(x_ptr+offs, x.to(tl.bfloat16), mask=mask)
 @triton.autotune(
-    configs=configs_triton
+    configs=configs_triton,
     key=['N'],
 )
 @triton.jit

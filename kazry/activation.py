@@ -2,15 +2,52 @@ import torch
 import torch.nn as nn
 import triton
 import triton.language as tl
+configs_triton = [
+    triton.Config({'BLOCK_SIZE': 128}, num_warps=2, num_stages=2),
+    triton.Config({'BLOCK_SIZE': 128}, num_warps=2, num_stages=3),
+    triton.Config({'BLOCK_SIZE': 128}, num_warps=2, num_stages=4),
+    triton.Config({'BLOCK_SIZE': 128}, num_warps=4, num_stages=2),
+    triton.Config({'BLOCK_SIZE': 128}, num_warps=4, num_stages=3),
+    triton.Config({'BLOCK_SIZE': 128}, num_warps=4, num_stages=4),
+    triton.Config({'BLOCK_SIZE': 256}, num_warps=2, num_stages=2),
+    triton.Config({'BLOCK_SIZE': 256}, num_warps=2, num_stages=3),
+    triton.Config({'BLOCK_SIZE': 256}, num_warps=2, num_stages=4),
+    triton.Config({'BLOCK_SIZE': 256}, num_warps=4, num_stages=2),
+    triton.Config({'BLOCK_SIZE': 256}, num_warps=4, num_stages=3),
+    triton.Config({'BLOCK_SIZE': 256}, num_warps=4, num_stages=4),
+    triton.Config({'BLOCK_SIZE': 256}, num_warps=6, num_stages=2),
+    triton.Config({'BLOCK_SIZE': 256}, num_warps=6, num_stages=3),
+    triton.Config({'BLOCK_SIZE': 256}, num_warps=6, num_stages=4),
+    triton.Config({'BLOCK_SIZE': 256}, num_warps=8, num_stages=2),
+    triton.Config({'BLOCK_SIZE': 256}, num_warps=8, num_stages=3),
+    triton.Config({'BLOCK_SIZE': 256}, num_warps=8, num_stages=4),
+    triton.Config({'BLOCK_SIZE': 512}, num_warps=2, num_stages=2),
+    triton.Config({'BLOCK_SIZE': 512}, num_warps=2, num_stages=3),
+    triton.Config({'BLOCK_SIZE': 512}, num_warps=2, num_stages=4),
+    triton.Config({'BLOCK_SIZE': 512}, num_warps=4, num_stages=2),
+    triton.Config({'BLOCK_SIZE': 512}, num_warps=4, num_stages=3),
+    triton.Config({'BLOCK_SIZE': 512}, num_warps=4, num_stages=4),
+    triton.Config({'BLOCK_SIZE': 512}, num_warps=6, num_stages=2),
+    triton.Config({'BLOCK_SIZE': 512}, num_warps=6, num_stages=3),
+    triton.Config({'BLOCK_SIZE': 512}, num_warps=6, num_stages=4),
+    triton.Config({'BLOCK_SIZE': 512}, num_warps=8, num_stages=2),
+    triton.Config({'BLOCK_SIZE': 512}, num_warps=8, num_stages=3),
+    triton.Config({'BLOCK_SIZE': 512}, num_warps=8, num_stages=4),
+    triton.Config({'BLOCK_SIZE': 1024}, num_warps=2, num_stages=2),
+    triton.Config({'BLOCK_SIZE': 1024}, num_warps=2, num_stages=3),
+    triton.Config({'BLOCK_SIZE': 1024}, num_warps=2, num_stages=4),
+    triton.Config({'BLOCK_SIZE': 1024}, num_warps=4, num_stages=2),
+    triton.Config({'BLOCK_SIZE': 1024}, num_warps=4, num_stages=3),
+    triton.Config({'BLOCK_SIZE': 1024}, num_warps=4, num_stages=4),
+    triton.Config({'BLOCK_SIZE': 1024}, num_warps=6, num_stages=2),
+    triton.Config({'BLOCK_SIZE': 1024}, num_warps=6, num_stages=3),
+    triton.Config({'BLOCK_SIZE': 1024}, num_warps=6, num_stages=4),
+    triton.Config({'BLOCK_SIZE': 1024}, num_warps=8, num_stages=2),
+    triton.Config({'BLOCK_SIZE': 1024}, num_warps=8, num_stages=3),
+    triton.Config({'BLOCK_SIZE': 1024}, num_warps=8, num_stages=4),
+]
 @triton.autotune(
-    configs=[
-        triton.Config({'BLOCK_SIZE': 128}, num_warps=2, num_stages=2),
-        triton.Config({'BLOCK_SIZE': 256}, num_warps=4, num_stages=2),
-        triton.Config({'BLOCK_SIZE': 512}, num_warps=4, num_stages=2),
-        triton.Config({'BLOCK_SIZE': 512}, num_warps=4, num_stages=3),
-        triton.Config({'BLOCK_SIZE': 1024}, num_warps=4, num_stages=2),
-        triton.Config({'BLOCK_SIZE': 1024}, num_warps=8, num_stages=3),
-    ],
+    configs=configs_triton
     key=['N'],
 )
 @triton.jit
@@ -25,14 +62,7 @@ def kazry_forward(
     x = x * scale
     tl.store(y_ptr+offs, x.to(tl.bfloat16), mask=mask)
 @triton.autotune(
-    configs=[
-        triton.Config({'BLOCK_SIZE': 128}, num_warps=2, num_stages=2),
-        triton.Config({'BLOCK_SIZE': 256}, num_warps=4, num_stages=2),
-        triton.Config({'BLOCK_SIZE': 512}, num_warps=4, num_stages=2),
-        triton.Config({'BLOCK_SIZE': 512}, num_warps=4, num_stages=3),
-        triton.Config({'BLOCK_SIZE': 1024}, num_warps=4, num_stages=2),
-        triton.Config({'BLOCK_SIZE': 1024}, num_warps=8, num_stages=3),
-    ],
+    configs=configs_triton
     key=['N'],
 )
 @triton.jit
@@ -47,14 +77,7 @@ def kazry_forward_in_place(
     x = x * scale
     tl.store(x_ptr+offs, x.to(tl.bfloat16), mask=mask)
 @triton.autotune(
-    configs=[
-        triton.Config({'BLOCK_SIZE': 128}, num_warps=2, num_stages=2),
-        triton.Config({'BLOCK_SIZE': 256}, num_warps=4, num_stages=2),
-        triton.Config({'BLOCK_SIZE': 512}, num_warps=4, num_stages=2),
-        triton.Config({'BLOCK_SIZE': 512}, num_warps=4, num_stages=3),
-        triton.Config({'BLOCK_SIZE': 1024}, num_warps=4, num_stages=2),
-        triton.Config({'BLOCK_SIZE': 1024}, num_warps=8, num_stages=3),
-    ],
+    configs=configs_triton
     key=['N'],
 )
 @triton.jit
